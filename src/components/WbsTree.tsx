@@ -16,8 +16,8 @@ import { findWbsNode, reorderWbsSiblings } from "@/lib/wbs";
 import { TaskDialog } from "./TaskDialog";
 import { DeleteButton } from "./DeleteButton";
 import { PriorityBadge } from "./PriorityBadge";
+import { TaskStatusSelect } from "./TaskStatusSelect";
 import { deleteTask, reorderSiblingTasks } from "@/lib/actions/tasks";
-import { taskStatusLabels } from "@/lib/labels";
 import { formatDate } from "@/lib/format";
 
 export function WbsTree({
@@ -152,9 +152,7 @@ function SortableWbsRow({
             AI下書き
           </span>
         )}
-        <span className="hidden text-xs text-stone-400 sm:inline">
-          {taskStatusLabels[node.status]}
-        </span>
+        <TaskStatusSelect taskId={node.id} projectId={projectId} status={node.status} />
         <PriorityBadge priority={node.priority} />
         {node.dueDate && (
           <span className="hidden text-xs text-stone-400 md:inline">{formatDate(node.dueDate)}</span>
@@ -168,7 +166,6 @@ function SortableWbsRow({
           />
           <DeleteButton
             action={deleteTask.bind(null, node.id, projectId)}
-            confirmText={`「${node.title}」を削除しますか?(子タスクも削除されます)`}
             label="削除"
             className="text-red-500 hover:underline"
           />

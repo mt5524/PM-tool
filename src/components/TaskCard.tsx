@@ -58,7 +58,6 @@ export function TaskCard({
         />
         <DeleteButton
           action={deleteTask.bind(null, task.id, projectId)}
-          confirmText={`「${task.title}」を削除しますか?`}
           label="削除"
           className="text-red-500 hover:underline"
         />

@@ -79,7 +79,6 @@ export default async function MilestonesPage({
               />
               <DeleteButton
                 action={deleteMilestone.bind(null, m.id, projectId)}
-                confirmText={`「${m.name}」を削除しますか?`}
                 label="削除"
                 className="text-sm text-red-500 hover:underline"
               />

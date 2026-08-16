@@ -9,7 +9,9 @@ export function DeleteButton({
   className,
 }: {
   action: () => Promise<void>;
-  confirmText: string;
+  /** Optional. Most deletes here are one-click; pass this only for
+   *  high-impact, irreversible deletes (e.g. deleting an entire project). */
+  confirmText?: string;
   label?: string;
   className?: string;
 }) {
@@ -20,11 +22,10 @@ export function DeleteButton({
       type="button"
       disabled={pending}
       onClick={() => {
-        if (window.confirm(confirmText)) {
-          startTransition(async () => {
-            await action();
-          });
-        }
+        if (confirmText && !window.confirm(confirmText)) return;
+        startTransition(async () => {
+          await action();
+        });
       }}
       className={className ?? "text-sm text-red-600 hover:underline disabled:opacity-50"}
     >

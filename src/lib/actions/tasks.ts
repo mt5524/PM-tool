@@ -60,6 +60,15 @@ export async function updateTask(taskId: string, projectId: string, formData: Fo
   revalidatePath(`/projects/${projectId}`);
 }
 
+/** Quick one-click status change (e.g. from the WBS row), without opening the full edit dialog. */
+export async function updateTaskStatus(taskId: string, projectId: string, status: TaskStatus) {
+  await prisma.task.update({
+    where: { id: taskId },
+    data: { status, isAiDraft: false },
+  });
+  revalidatePath(`/projects/${projectId}`);
+}
+
 export async function deleteTask(taskId: string, projectId: string) {
   await prisma.task.delete({ where: { id: taskId } });
   revalidatePath(`/projects/${projectId}`);

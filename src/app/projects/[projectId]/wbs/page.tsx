@@ -17,7 +17,7 @@ export default async function WbsPage({
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-medium text-stone-800">WBS(作業分解構成図)</h2>
+        <h2 className="text-lg font-medium text-stone-800">WBS</h2>
         <div className="flex items-center gap-2">
           <ImportDialog
             projectId={projectId}
