@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -46,10 +46,14 @@ export function KanbanBoard({
   const [columns, setColumns] = useState<ColumnsState>(() => groupByStatus(tasks));
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
-  // keep local drag state in sync whenever the server data changes (e.g. after edits)
-  useEffect(() => {
+  // Keep local drag state in sync whenever the server data changes (e.g.
+  // after edits). Adjusting state during render (rather than in an effect)
+  // avoids an extra commit.
+  const [prevTasks, setPrevTasks] = useState(tasks);
+  if (tasks !== prevTasks) {
+    setPrevTasks(tasks);
     setColumns(groupByStatus(tasks));
-  }, [tasks]);
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -158,13 +162,13 @@ function Column({
 
   return (
     <div
-      className={`flex flex-col rounded-lg border bg-neutral-50 ${
-        isOver ? "border-sky-400" : "border-neutral-200"
+      className={`flex flex-col rounded-lg border bg-stone-50 ${
+        isOver ? "border-amber-400" : "border-stone-200"
       }`}
     >
-      <div className="flex items-center justify-between border-b border-neutral-200 px-3 py-2">
-        <h3 className="text-sm font-medium text-neutral-700">{taskStatusLabels[status]}</h3>
-        <span className="text-xs text-neutral-400">{tasks.length}</span>
+      <div className="flex items-center justify-between border-b border-stone-200 px-3 py-2">
+        <h3 className="text-sm font-medium text-stone-700">{taskStatusLabels[status]}</h3>
+        <span className="text-xs text-stone-400">{tasks.length}</span>
       </div>
       <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
         <div ref={setNodeRef} className="flex min-h-[120px] flex-1 flex-col gap-2 p-2">
@@ -178,12 +182,12 @@ function Column({
           ))}
         </div>
       </SortableContext>
-      <div className="border-t border-neutral-200 p-2">
+      <div className="border-t border-stone-200 p-2">
         <TaskDialog
           projectId={projectId}
           defaultStatus={status}
           taskOptions={taskOptions}
-          trigger={<span className="text-sm text-sky-600 hover:underline">+ タスク追加</span>}
+          trigger={<span className="text-sm text-amber-700 hover:underline">+ タスク追加</span>}
         />
       </div>
     </div>

@@ -11,11 +11,11 @@ function barColor(status: TaskStatus): string {
     case "DONE":
       return "bg-emerald-400";
     case "IN_PROGRESS":
-      return "bg-sky-400";
+      return "bg-amber-400";
     case "REVIEW":
       return "bg-purple-400";
     default:
-      return "bg-neutral-300";
+      return "bg-stone-300";
   }
 }
 
@@ -29,7 +29,7 @@ export function GanttChart({ tasks, milestones }: { tasks: Task[]; milestones: M
 
   if (dates.length === 0) {
     return (
-      <p className="text-sm text-neutral-500">
+      <p className="text-sm text-stone-500">
         開始日・期限日が設定されたタスクやマイルストーンがありません。タスクやマイルストーンに日付を設定するとここにガントチャートが表示されます。
       </p>
     );
@@ -50,11 +50,11 @@ export function GanttChart({ tasks, milestones }: { tasks: Task[]; milestones: M
   const tasksWithDates = tasks.filter((t) => t.startDate || t.dueDate);
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-neutral-200">
+    <div className="overflow-x-auto rounded-lg border border-stone-200">
       <div style={{ width: totalWidth + LABEL_WIDTH }}>
-        <div className="flex border-b border-neutral-200 bg-white">
+        <div className="flex border-b border-stone-200 bg-white">
           <div
-            className="shrink-0 border-r border-neutral-200 px-3 py-2 text-xs font-medium text-neutral-500"
+            className="shrink-0 border-r border-stone-200 px-3 py-2 text-xs font-medium text-stone-500"
             style={{ width: LABEL_WIDTH }}
           >
             タスク
@@ -63,7 +63,7 @@ export function GanttChart({ tasks, milestones }: { tasks: Task[]; milestones: M
             {weekTicks.map((d) => (
               <div
                 key={d.toISOString()}
-                className="absolute top-0 h-full border-l border-neutral-100 pt-1.5 pl-1 text-[11px] text-neutral-400"
+                className="absolute top-0 h-full border-l border-stone-100 pt-1.5 pl-1 text-[11px] text-stone-400"
                 style={{ left: xFor(d) }}
               >
                 {format(d, "M/d", { locale: ja })}
@@ -73,7 +73,7 @@ export function GanttChart({ tasks, milestones }: { tasks: Task[]; milestones: M
         </div>
 
         {tasksWithDates.length === 0 && (
-          <p className="px-3 py-4 text-sm text-neutral-400">日付が設定されたタスクはありません。</p>
+          <p className="px-3 py-4 text-sm text-stone-400">日付が設定されたタスクはありません。</p>
         )}
 
         {tasksWithDates.map((task) => {
@@ -82,9 +82,9 @@ export function GanttChart({ tasks, milestones }: { tasks: Task[]; milestones: M
           const left = xFor(start);
           const width = Math.max(xFor(end) - xFor(start) + DAY_WIDTH, DAY_WIDTH);
           return (
-            <div key={task.id} className="flex border-b border-neutral-100">
+            <div key={task.id} className="flex border-b border-stone-100">
               <div
-                className="shrink-0 truncate border-r border-neutral-200 px-3 py-2.5 text-sm text-neutral-700"
+                className="shrink-0 truncate border-r border-stone-200 px-3 py-2.5 text-sm text-stone-700"
                 style={{ width: LABEL_WIDTH }}
               >
                 {task.title}
@@ -107,9 +107,9 @@ export function GanttChart({ tasks, milestones }: { tasks: Task[]; milestones: M
         })}
 
         {milestones.map((m) => (
-          <div key={m.id} className="flex border-b border-neutral-100 bg-amber-50/50">
+          <div key={m.id} className="flex border-b border-stone-100 bg-amber-50/50">
             <div
-              className="shrink-0 truncate border-r border-neutral-200 px-3 py-2.5 text-sm text-amber-800"
+              className="shrink-0 truncate border-r border-stone-200 px-3 py-2.5 text-sm text-amber-800"
               style={{ width: LABEL_WIDTH }}
             >
               ◆ {m.name}

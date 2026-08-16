@@ -20,13 +20,13 @@ export default async function MilestonesPage({
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-medium text-neutral-800">マイルストーン</h2>
+        <h2 className="text-lg font-medium text-stone-800">マイルストーン</h2>
         <div className="flex items-center gap-2">
           <ImportDialog
             projectId={projectId}
             mode="milestones"
             trigger={
-              <span className="rounded border border-violet-300 px-3 py-1.5 text-sm text-violet-700 hover:bg-violet-50">
+              <span className="rounded-lg border border-violet-300 px-3 py-1.5 text-sm text-violet-700 hover:bg-violet-50">
                 文書からインポート
               </span>
             }
@@ -34,7 +34,7 @@ export default async function MilestonesPage({
           <MilestoneDialog
             projectId={projectId}
             trigger={
-              <span className="rounded bg-sky-600 px-3 py-1.5 text-sm text-white hover:bg-sky-700">
+              <span className="rounded-lg bg-amber-700 px-3 py-1.5 text-sm text-white hover:bg-amber-800">
                 + マイルストーン追加
               </span>
             }
@@ -43,29 +43,29 @@ export default async function MilestonesPage({
       </div>
 
       {milestones.length === 0 ? (
-        <p className="text-sm text-neutral-500">マイルストーンがまだありません。</p>
+        <p className="text-sm text-stone-500">マイルストーンがまだありません。</p>
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-2.5">
           {milestones.map((m) => (
             <li
               key={m.id}
-              className="flex items-center gap-3 rounded-lg border border-neutral-200 bg-white px-4 py-3"
+              className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3.5 shadow-sm"
             >
               <ToggleDoneCheckbox milestoneId={m.id} projectId={projectId} done={m.done} />
               <div className="flex-1">
                 <p
                   className={`text-sm font-medium ${
-                    m.done ? "text-neutral-400 line-through" : "text-neutral-800"
+                    m.done ? "text-stone-400 line-through" : "text-stone-800"
                   }`}
                 >
                   {m.name}
                   {m.isAiDraft && (
-                    <span className="ml-2 rounded bg-violet-100 px-1.5 py-0.5 text-[11px] font-medium text-violet-700">
+                    <span className="ml-2 rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-medium text-violet-700">
                       AI下書き
                     </span>
                   )}
                 </p>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-stone-400">
                   {formatDate(m.date)}
                   {m.description ? ` ・ ${m.description}` : ""}
                 </p>
@@ -74,7 +74,7 @@ export default async function MilestonesPage({
                 projectId={projectId}
                 milestone={m}
                 trigger={
-                  <span className="cursor-pointer text-sm text-sky-600 hover:underline">編集</span>
+                  <span className="cursor-pointer text-sm text-amber-700 hover:underline">編集</span>
                 }
               />
               <DeleteButton

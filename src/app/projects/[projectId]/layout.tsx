@@ -17,19 +17,19 @@ export default async function ProjectLayout({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <Link href="/" className="text-sm text-neutral-400 hover:text-neutral-600">
+      <Link href="/" className="text-sm text-stone-400 hover:text-stone-600">
         ← プロジェクト一覧
       </Link>
       <div className="mt-2 mb-1 flex items-center gap-3">
-        <h1 className="text-2xl font-semibold text-neutral-900">{project.name}</h1>
+        <h1 className="text-2xl font-semibold text-stone-900">{project.name}</h1>
         <span
-          className={`rounded px-2 py-0.5 text-xs font-medium ${projectStatusColors[project.status]}`}
+          className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${projectStatusColors[project.status]}`}
         >
           {projectStatusLabels[project.status]}
         </span>
       </div>
       {project.description && (
-        <p className="mb-4 text-sm text-neutral-500">{project.description}</p>
+        <p className="mb-4 text-sm text-stone-500">{project.description}</p>
       )}
       <ProjectTabs projectId={projectId} />
       {children}

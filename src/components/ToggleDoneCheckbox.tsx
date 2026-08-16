@@ -25,7 +25,7 @@ export function ToggleDoneCheckbox({
           await toggleMilestoneDone(milestoneId, projectId, checked);
         });
       }}
-      className="h-4 w-4 rounded border-neutral-300"
+      className="h-4 w-4 rounded border-stone-300"
     />
   );
 }

@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Warm, low-contrast neutrals — a soft cream page background with a
+     gentle (not pure-black) ink color, easier on the eyes than the
+     stark white/near-black default. */
+  --background: #fbf7f0;
+  --foreground: #292524;
 }
 
 @theme inline {
@@ -14,8 +17,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1c1917;
+    --foreground: #e7e5e4;
   }
 }
 

@@ -67,17 +67,17 @@ export function ImportDialog({
       </button>
       <dialog
         ref={dialogRef}
-        className="w-[min(36rem,92vw)] rounded-lg p-0 backdrop:bg-black/40"
+        className="w-[min(36rem,92vw)] rounded-xl p-0 shadow-xl backdrop:bg-stone-900/30"
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-3 p-5">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold">文書から{label}をインポート</h2>
-            <button type="button" onClick={handleClose} className="text-neutral-400 hover:text-neutral-600">
+            <button type="button" onClick={handleClose} className="text-stone-400 hover:text-stone-600">
               ✕
             </button>
           </div>
 
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-stone-500">
             テキスト/Markdown文書を貼り付けるか、ファイルを選択してください。AIが内容を解析し、
             {label}の下書きとして追加します(内容は後から確認・編集できます)。
           </p>
@@ -100,7 +100,7 @@ export function ImportDialog({
               required
               rows={10}
               placeholder="ここに文書を貼り付けてください..."
-              className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
             />
           </label>
 
@@ -111,14 +111,14 @@ export function ImportDialog({
             <button
               type="button"
               onClick={handleClose}
-              className="rounded px-3 py-1.5 text-sm text-neutral-600 hover:bg-neutral-100"
+              className="rounded-lg px-3 py-1.5 text-sm text-stone-600 hover:bg-stone-100"
             >
               閉じる
             </button>
             <button
               type="submit"
               disabled={pending || !text.trim()}
-              className="rounded bg-violet-600 px-3 py-1.5 text-sm text-white hover:bg-violet-700 disabled:opacity-50"
+              className="rounded-lg bg-violet-600 px-3 py-1.5 text-sm text-white hover:bg-violet-700 disabled:opacity-50"
             >
               {pending ? "AIが解析中..." : "変換して追加"}
             </button>

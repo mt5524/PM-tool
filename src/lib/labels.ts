@@ -9,11 +9,11 @@ export const projectStatusLabels: Record<ProjectStatus, string> = {
 };
 
 export const projectStatusColors: Record<ProjectStatus, string> = {
-  PLANNING: "bg-slate-100 text-slate-700",
+  PLANNING: "bg-stone-100 text-stone-700",
   ACTIVE: "bg-emerald-100 text-emerald-700",
   ON_HOLD: "bg-amber-100 text-amber-700",
-  COMPLETED: "bg-blue-100 text-blue-700",
-  ARCHIVED: "bg-neutral-200 text-neutral-500",
+  COMPLETED: "bg-teal-100 text-teal-700",
+  ARCHIVED: "bg-stone-200 text-stone-500",
 };
 
 export const taskStatusLabels: Record<TaskStatus, string> = {
@@ -38,8 +38,8 @@ export const priorityLabels: Record<Priority, string> = {
 };
 
 export const priorityColors: Record<Priority, string> = {
-  LOW: "bg-slate-100 text-slate-600",
-  MEDIUM: "bg-sky-100 text-sky-700",
+  LOW: "bg-stone-100 text-stone-600",
+  MEDIUM: "bg-amber-50 text-amber-700",
   HIGH: "bg-orange-100 text-orange-700",
   URGENT: "bg-red-100 text-red-700",
 };

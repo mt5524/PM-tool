@@ -52,7 +52,7 @@ export function TaskDialog({
       </button>
       <dialog
         ref={dialogRef}
-        className="w-[min(34rem,92vw)] rounded-lg p-0 backdrop:bg-black/40"
+        className="w-[min(34rem,92vw)] rounded-xl p-0 shadow-xl backdrop:bg-stone-900/30"
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-3 p-5">
           <div className="flex items-center justify-between">
@@ -60,7 +60,7 @@ export function TaskDialog({
             <button
               type="button"
               onClick={() => dialogRef.current?.close()}
-              className="text-neutral-400 hover:text-neutral-600"
+              className="text-stone-400 hover:text-stone-600"
             >
               ✕
             </button>
@@ -73,7 +73,7 @@ export function TaskDialog({
               required
               defaultValue={task?.title}
               autoFocus
-              className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
             />
           </label>
 
@@ -83,7 +83,7 @@ export function TaskDialog({
               name="description"
               defaultValue={task?.description ?? ""}
               rows={2}
-              className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
             />
           </label>
 
@@ -93,7 +93,7 @@ export function TaskDialog({
               <select
                 name="status"
                 defaultValue={task?.status ?? defaultStatus ?? "TODO"}
-                className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+                className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
               >
                 {taskStatusOrder.map((s) => (
                   <option key={s} value={s}>
@@ -107,7 +107,7 @@ export function TaskDialog({
               <select
                 name="priority"
                 defaultValue={task?.priority ?? Priority.MEDIUM}
-                className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+                className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
               >
                 {Object.values(Priority).map((p) => (
                   <option key={p} value={p}>
@@ -125,7 +125,7 @@ export function TaskDialog({
                 type="date"
                 name="startDate"
                 defaultValue={toDateInputValue(task?.startDate)}
-                className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+                className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
               />
             </label>
             <label className="text-sm">
@@ -134,7 +134,7 @@ export function TaskDialog({
                 type="date"
                 name="dueDate"
                 defaultValue={toDateInputValue(task?.dueDate)}
-                className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+                className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
               />
             </label>
           </div>
@@ -144,7 +144,7 @@ export function TaskDialog({
             <input
               name="assignee"
               defaultValue={task?.assignee ?? ""}
-              className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
             />
           </label>
 
@@ -153,7 +153,7 @@ export function TaskDialog({
             <select
               name="parentId"
               defaultValue={task?.parentId ?? ""}
-              className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
             >
               <option value="">(なし)</option>
               {taskOptions
@@ -172,14 +172,14 @@ export function TaskDialog({
             <button
               type="button"
               onClick={() => dialogRef.current?.close()}
-              className="rounded px-3 py-1.5 text-sm text-neutral-600 hover:bg-neutral-100"
+              className="rounded-lg px-3 py-1.5 text-sm text-stone-600 hover:bg-stone-100"
             >
               キャンセル
             </button>
             <button
               type="submit"
               disabled={pending}
-              className="rounded bg-sky-600 px-3 py-1.5 text-sm text-white hover:bg-sky-700 disabled:opacity-50"
+              className="rounded-lg bg-amber-700 px-3 py-1.5 text-sm text-white hover:bg-amber-800 disabled:opacity-50"
             >
               {pending ? "保存中..." : "保存"}
             </button>

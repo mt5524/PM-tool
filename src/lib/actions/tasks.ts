@@ -66,6 +66,22 @@ export async function deleteTask(taskId: string, projectId: string) {
 }
 
 /**
+ * Called from the WBS tree after a drag-and-drop reorder within the same
+ * parent (siblings only — reparenting via drag is not supported).
+ * `orderedIds` is the full, final ordering of the sibling tasks under `parentId`.
+ */
+export async function reorderSiblingTasks(
+  projectId: string,
+  parentId: string | null,
+  orderedIds: string[],
+) {
+  await prisma.$transaction(
+    orderedIds.map((id, index) => prisma.task.update({ where: { id }, data: { order: index } })),
+  );
+  revalidatePath(`/projects/${projectId}`);
+}
+
+/**
  * Called from the Kanban board after a drag-and-drop action.
  * `orderedIds` is the full, final ordering of task ids within the destination column
  * (including the moved task), used to persist both status and order in one go.

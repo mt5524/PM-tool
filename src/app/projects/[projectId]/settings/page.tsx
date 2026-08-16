@@ -20,7 +20,7 @@ export default async function ProjectSettingsPage({
   return (
     <div className="flex max-w-lg flex-col gap-8">
       <form action={updateProjectWithId} className="flex flex-col gap-3">
-        <h2 className="mb-1 text-lg font-medium text-neutral-800">プロジェクト設定</h2>
+        <h2 className="mb-1 text-lg font-medium text-stone-800">プロジェクト設定</h2>
 
         <label className="text-sm">
           プロジェクト名
@@ -28,7 +28,7 @@ export default async function ProjectSettingsPage({
             name="name"
             required
             defaultValue={project.name}
-            className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+            className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
           />
         </label>
 
@@ -38,7 +38,7 @@ export default async function ProjectSettingsPage({
             name="description"
             defaultValue={project.description ?? ""}
             rows={3}
-            className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+            className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
           />
         </label>
 
@@ -47,7 +47,7 @@ export default async function ProjectSettingsPage({
           <select
             name="status"
             defaultValue={project.status}
-            className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+            className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
           >
             {Object.values(ProjectStatus).map((s) => (
               <option key={s} value={s}>
@@ -64,7 +64,7 @@ export default async function ProjectSettingsPage({
               type="date"
               name="startDate"
               defaultValue={toDateInputValue(project.startDate)}
-              className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
             />
           </label>
           <label className="text-sm">
@@ -73,14 +73,14 @@ export default async function ProjectSettingsPage({
               type="date"
               name="endDate"
               defaultValue={toDateInputValue(project.endDate)}
-              className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
             />
           </label>
         </div>
 
         <button
           type="submit"
-          className="mt-2 self-start rounded bg-sky-600 px-4 py-1.5 text-sm text-white hover:bg-sky-700"
+          className="mt-2 self-start rounded bg-amber-700 px-4 py-1.5 text-sm text-white hover:bg-amber-800"
         >
           保存
         </button>
@@ -95,7 +95,7 @@ export default async function ProjectSettingsPage({
           action={deleteProject.bind(null, projectId)}
           confirmText={`「${project.name}」を削除しますか?この操作は取り消せません。`}
           label="プロジェクトを削除"
-          className="rounded bg-red-600 px-3 py-1.5 text-xs text-white hover:bg-red-700"
+          className="rounded-lg bg-red-600 px-3 py-1.5 text-xs text-white hover:bg-red-700"
         />
       </div>
     </div>

@@ -46,7 +46,7 @@ export function MilestoneDialog({
       </button>
       <dialog
         ref={dialogRef}
-        className="w-[min(28rem,92vw)] rounded-lg p-0 backdrop:bg-black/40"
+        className="w-[min(28rem,92vw)] rounded-xl p-0 shadow-xl backdrop:bg-stone-900/30"
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-3 p-5">
           <div className="flex items-center justify-between">
@@ -56,7 +56,7 @@ export function MilestoneDialog({
             <button
               type="button"
               onClick={() => dialogRef.current?.close()}
-              className="text-neutral-400 hover:text-neutral-600"
+              className="text-stone-400 hover:text-stone-600"
             >
               ✕
             </button>
@@ -69,7 +69,7 @@ export function MilestoneDialog({
               required
               autoFocus
               defaultValue={milestone?.name}
-              className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
             />
           </label>
 
@@ -80,7 +80,7 @@ export function MilestoneDialog({
               name="date"
               required
               defaultValue={toDateInputValue(milestone?.date)}
-              className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
             />
           </label>
 
@@ -90,7 +90,7 @@ export function MilestoneDialog({
               name="description"
               defaultValue={milestone?.description ?? ""}
               rows={2}
-              className="mt-1 w-full rounded border border-neutral-300 px-2 py-1.5 text-sm"
+              className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
             />
           </label>
 
@@ -100,14 +100,14 @@ export function MilestoneDialog({
             <button
               type="button"
               onClick={() => dialogRef.current?.close()}
-              className="rounded px-3 py-1.5 text-sm text-neutral-600 hover:bg-neutral-100"
+              className="rounded-lg px-3 py-1.5 text-sm text-stone-600 hover:bg-stone-100"
             >
               キャンセル
             </button>
             <button
               type="submit"
               disabled={pending}
-              className="rounded bg-sky-600 px-3 py-1.5 text-sm text-white hover:bg-sky-700 disabled:opacity-50"
+              className="rounded-lg bg-amber-700 px-3 py-1.5 text-sm text-white hover:bg-amber-800 disabled:opacity-50"
             >
               {pending ? "保存中..." : "保存"}
             </button>

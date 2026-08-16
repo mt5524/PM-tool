@@ -17,13 +17,13 @@ export default async function WbsPage({
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-medium text-neutral-800">WBS(作業分解構成図)</h2>
+        <h2 className="text-lg font-medium text-stone-800">WBS(作業分解構成図)</h2>
         <div className="flex items-center gap-2">
           <ImportDialog
             projectId={projectId}
             mode="tasks"
             trigger={
-              <span className="rounded border border-violet-300 px-3 py-1.5 text-sm text-violet-700 hover:bg-violet-50">
+              <span className="rounded-lg border border-violet-300 px-3 py-1.5 text-sm text-violet-700 hover:bg-violet-50">
                 文書からインポート
               </span>
             }
@@ -32,7 +32,7 @@ export default async function WbsPage({
             projectId={projectId}
             taskOptions={taskOptions}
             trigger={
-              <span className="rounded bg-sky-600 px-3 py-1.5 text-sm text-white hover:bg-sky-700">
+              <span className="rounded-lg bg-amber-700 px-3 py-1.5 text-sm text-white hover:bg-amber-800">
                 + タスク追加
               </span>
             }
