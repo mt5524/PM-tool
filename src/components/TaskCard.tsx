@@ -39,7 +39,20 @@ export function TaskCard({
           ⠿
         </button>
         <div className="min-w-0 flex-1">
-          <p className="break-words text-sm font-medium text-stone-800">{task.title}</p>
+          <p className="break-words text-sm font-medium text-stone-800">
+            {task.title}
+            {task.referenceUrl && (
+              <a
+                href={task.referenceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="参照URLを開く"
+                className="ml-1.5 text-stone-400 hover:text-amber-700"
+              >
+                🔗
+              </a>
+            )}
+          </p>
           {task.dueDate && (
             <p className="mt-0.5 text-xs text-stone-400">期限: {formatDate(task.dueDate)}</p>
           )}

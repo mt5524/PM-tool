@@ -149,6 +149,17 @@ export function TaskDialog({
           </label>
 
           <label className="text-sm">
+            参照URL(仕様書・Notion・Google Docsなど)
+            <input
+              type="url"
+              name="referenceUrl"
+              placeholder="https://..."
+              defaultValue={task?.referenceUrl ?? ""}
+              className="mt-1 w-full rounded-lg border border-stone-300 px-2 py-1.5 text-sm"
+            />
+          </label>
+
+          <label className="text-sm">
             親タスク(WBS)
             <select
               name="parentId"

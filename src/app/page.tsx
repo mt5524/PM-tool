@@ -17,13 +17,21 @@ export default async function DashboardPage() {
           <h1 className="text-2xl font-semibold text-stone-900">プロジェクト</h1>
           <p className="mt-1 text-sm text-stone-500">すべてのプロジェクトの一覧です</p>
         </div>
-        <ProjectDialog
-          trigger={
-            <span className="rounded-lg bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-800">
-              + 新規プロジェクト
-            </span>
-          }
-        />
+        <div className="flex items-center gap-2">
+          <Link
+            href="/milestones"
+            className="rounded-lg border border-stone-300 px-4 py-2 text-sm text-stone-600 hover:bg-stone-100"
+          >
+            全マイルストーン
+          </Link>
+          <ProjectDialog
+            trigger={
+              <span className="rounded-lg bg-amber-700 px-4 py-2 text-sm font-medium text-white hover:bg-amber-800">
+                + 新規プロジェクト
+              </span>
+            }
+          />
+        </div>
       </div>
 
       {projects.length === 0 ? (

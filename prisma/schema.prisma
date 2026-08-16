@@ -62,6 +62,10 @@ model Task {
   order       Int        @default(0)
   assignee    String?
 
+  // Optional link to an external reference document (Google Docs, Notion,
+  // spec sheet, etc.) — just a plain URL, no content fetching.
+  referenceUrl String?
+
   // Set when this task was created by AI document import and not yet
   // reviewed by a human. Cleared once the task is edited/confirmed.
   isAiDraft Boolean @default(false)

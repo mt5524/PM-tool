@@ -147,6 +147,17 @@ function SortableWbsRow({
         </button>
         <span className="w-12 shrink-0 font-mono text-xs text-stone-400">{node.wbsCode}</span>
         <span className="flex-1 truncate text-sm text-stone-800">{node.title}</span>
+        {node.referenceUrl && (
+          <a
+            href={node.referenceUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="参照URLを開く"
+            className="shrink-0 text-stone-400 hover:text-amber-700"
+          >
+            🔗
+          </a>
+        )}
         {node.isAiDraft && (
           <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-medium text-violet-700">
             AI下書き

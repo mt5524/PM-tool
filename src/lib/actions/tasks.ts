@@ -27,6 +27,7 @@ export async function createTask(projectId: string, formData: FormData) {
       startDate: parseDate(formData.get("startDate")),
       dueDate: parseDate(formData.get("dueDate")),
       assignee: parseOptionalString(formData.get("assignee")),
+      referenceUrl: parseOptionalString(formData.get("referenceUrl")),
       order: (maxOrder._max.order ?? -1) + 1,
     },
   });
@@ -52,6 +53,7 @@ export async function updateTask(taskId: string, projectId: string, formData: Fo
       startDate: parseDate(formData.get("startDate")),
       dueDate: parseDate(formData.get("dueDate")),
       assignee: parseOptionalString(formData.get("assignee")),
+      referenceUrl: parseOptionalString(formData.get("referenceUrl")),
       // Editing and saving is treated as human review/confirmation.
       isAiDraft: false,
     },
