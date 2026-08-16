@@ -38,6 +38,11 @@ export function WbsTree({
           <div className="group flex items-center gap-2 rounded px-2 py-1.5 hover:bg-neutral-50">
             <span className="w-12 shrink-0 font-mono text-xs text-neutral-400">{node.wbsCode}</span>
             <span className="flex-1 truncate text-sm text-neutral-800">{node.title}</span>
+            {node.isAiDraft && (
+              <span className="rounded bg-violet-100 px-1.5 py-0.5 text-[11px] font-medium text-violet-700">
+                AI下書き
+              </span>
+            )}
             <span className="hidden text-xs text-neutral-400 sm:inline">
               {taskStatusLabels[node.status]}
             </span>

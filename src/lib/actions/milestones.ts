@@ -38,6 +38,8 @@ export async function updateMilestone(
       name,
       date,
       description: parseOptionalString(formData.get("description")),
+      // Editing and saving is treated as human review/confirmation.
+      isAiDraft: false,
     },
   });
 

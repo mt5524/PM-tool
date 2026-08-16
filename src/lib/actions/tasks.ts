@@ -52,6 +52,8 @@ export async function updateTask(taskId: string, projectId: string, formData: Fo
       startDate: parseDate(formData.get("startDate")),
       dueDate: parseDate(formData.get("dueDate")),
       assignee: parseOptionalString(formData.get("assignee")),
+      // Editing and saving is treated as human review/confirmation.
+      isAiDraft: false,
     },
   });
 

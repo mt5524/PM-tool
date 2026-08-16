@@ -62,6 +62,10 @@ model Task {
   order       Int        @default(0)
   assignee    String?
 
+  // Set when this task was created by AI document import and not yet
+  // reviewed by a human. Cleared once the task is edited/confirmed.
+  isAiDraft Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -78,6 +82,10 @@ model Milestone {
   date        DateTime
   description String?
   done        Boolean  @default(false)
+
+  // Set when this milestone was created by AI document import and not yet
+  // reviewed by a human. Cleared once the milestone is edited/confirmed.
+  isAiDraft Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

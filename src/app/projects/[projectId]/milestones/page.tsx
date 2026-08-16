@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { MilestoneDialog } from "@/components/MilestoneDialog";
+import { ImportDialog } from "@/components/ImportDialog";
 import { DeleteButton } from "@/components/DeleteButton";
 import { ToggleDoneCheckbox } from "@/components/ToggleDoneCheckbox";
 import { deleteMilestone } from "@/lib/actions/milestones";
@@ -20,14 +21,25 @@ export default async function MilestonesPage({
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-medium text-neutral-800">マイルストーン</h2>
-        <MilestoneDialog
-          projectId={projectId}
-          trigger={
-            <span className="rounded bg-sky-600 px-3 py-1.5 text-sm text-white hover:bg-sky-700">
-              + マイルストーン追加
-            </span>
-          }
-        />
+        <div className="flex items-center gap-2">
+          <ImportDialog
+            projectId={projectId}
+            mode="milestones"
+            trigger={
+              <span className="rounded border border-violet-300 px-3 py-1.5 text-sm text-violet-700 hover:bg-violet-50">
+                文書からインポート
+              </span>
+            }
+          />
+          <MilestoneDialog
+            projectId={projectId}
+            trigger={
+              <span className="rounded bg-sky-600 px-3 py-1.5 text-sm text-white hover:bg-sky-700">
+                + マイルストーン追加
+              </span>
+            }
+          />
+        </div>
       </div>
 
       {milestones.length === 0 ? (
@@ -47,6 +59,11 @@ export default async function MilestonesPage({
                   }`}
                 >
                   {m.name}
+                  {m.isAiDraft && (
+                    <span className="ml-2 rounded bg-violet-100 px-1.5 py-0.5 text-[11px] font-medium text-violet-700">
+                      AI下書き
+                    </span>
+                  )}
                 </p>
                 <p className="text-xs text-neutral-400">
                   {formatDate(m.date)}
