@@ -1,13 +1,10 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { ToggleDoneCheckbox } from "@/components/ToggleDoneCheckbox";
-import { formatDate } from "@/lib/format";
 
 /**
- * Cross-project milestone dashboard — one section per project showing its
- * completion rate, followed by that project's milestones (soonest first).
- * Projects are ordered by their nearest incomplete milestone so the ones
- * needing attention surface at the top.
+ * Cross-project milestone dashboard — one compact row per project showing
+ * its completion rate and schedule status. Click through to a project's
+ * own milestones page for the detailed list.
  */
 export default async function AllMilestonesPage() {
   const projects = await prisma.project.findMany({
@@ -66,81 +63,42 @@ export default async function AllMilestonesPage() {
           マイルストーンがまだありません。各プロジェクトのマイルストーン画面から追加してください。
         </div>
       ) : (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-2">
           {projectStats.map(
             ({ project, total, doneCount, percentage, overdueCount, scheduleStatus }) => (
-            <section
-              key={project.id}
-              className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm"
-            >
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <Link
-                  href={`/projects/${project.id}/milestones`}
-                  className="truncate font-medium text-stone-800 hover:text-amber-700"
-                >
+              <Link
+                key={project.id}
+                href={`/projects/${project.id}/milestones`}
+                className="flex items-center gap-4 rounded-xl border border-stone-200 bg-white px-5 py-3.5 shadow-sm transition hover:border-amber-300 hover:shadow-md"
+              >
+                <span className="min-w-0 flex-1 truncate font-medium text-stone-800">
                   {project.name}
-                </Link>
-                <div className="flex shrink-0 items-center gap-2 text-xs text-stone-500">
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 font-medium ${scheduleBadge[scheduleStatus].className}`}
-                  >
-                    {scheduleBadge[scheduleStatus].label}
-                    {scheduleStatus === "delayed" ? ` (${overdueCount}件)` : ""}
-                  </span>
-                  <span>
-                    {doneCount}/{total} 完了
-                  </span>
-                  <span className="font-semibold text-stone-700">{percentage}%</span>
+                </span>
+
+                <div className="hidden h-2 w-40 shrink-0 overflow-hidden rounded-full bg-stone-100 sm:block">
+                  <div
+                    className={`h-full rounded-full ${
+                      percentage === 100 ? "bg-emerald-500" : "bg-amber-600"
+                    }`}
+                    style={{ width: `${percentage}%` }}
+                  />
                 </div>
-              </div>
 
-              <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-stone-100">
-                <div
-                  className={`h-full rounded-full ${
-                    percentage === 100 ? "bg-emerald-500" : "bg-amber-600"
-                  }`}
-                  style={{ width: `${percentage}%` }}
-                />
-              </div>
-
-              <ul className="flex flex-col gap-1.5">
-                {project.milestones.map((m) => {
-                  const overdue = !m.done && m.date < today;
-                  return (
-                    <li
-                      key={m.id}
-                      className={`flex items-center gap-3 rounded-lg px-2 py-1.5 ${
-                        overdue ? "bg-red-50" : "hover:bg-stone-50"
-                      }`}
-                    >
-                      <ToggleDoneCheckbox milestoneId={m.id} projectId={project.id} done={m.done} />
-                      <div className="min-w-0 flex-1">
-                        <p
-                          className={`text-sm font-medium ${
-                            m.done ? "text-stone-400 line-through" : "text-stone-800"
-                          }`}
-                        >
-                          {m.name}
-                          {m.isAiDraft && (
-                            <span className="ml-2 rounded-full bg-violet-100 px-2 py-0.5 text-[11px] font-medium text-violet-700">
-                              AI下書き
-                            </span>
-                          )}
-                        </p>
-                        <p className="text-xs text-stone-400">
-                          {formatDate(m.date)}
-                          {m.description ? ` ・ ${m.description}` : ""}
-                        </p>
-                      </div>
-                      {overdue && (
-                        <span className="shrink-0 text-xs font-medium text-red-600">遅延</span>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ))}
+                <span className="shrink-0 text-sm text-stone-500">
+                  {doneCount}/{total} 完了
+                </span>
+                <span className="w-12 shrink-0 text-right text-sm font-semibold text-stone-700">
+                  {percentage}%
+                </span>
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${scheduleBadge[scheduleStatus].className}`}
+                >
+                  {scheduleBadge[scheduleStatus].label}
+                  {scheduleStatus === "delayed" ? ` (${overdueCount}件)` : ""}
+                </span>
+              </Link>
+            ),
+          )}
         </div>
       )}
     </div>
