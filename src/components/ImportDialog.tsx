@@ -12,6 +12,7 @@ import type { ExtractedTask, ExtractedMilestone } from "@/lib/ai/document-import
 import { priorityLabels } from "@/lib/labels";
 
 type Phase = "input" | "preview";
+type ExistingTaskInfo = { title: string; childCount: number };
 
 export function ImportDialog({
   projectId,
@@ -31,8 +32,12 @@ export function ImportDialog({
   const router = useRouter();
 
   const [previewTasks, setPreviewTasks] = useState<ExtractedTask[]>([]);
-  const [existingTaskTitles, setExistingTaskTitles] = useState<Map<string, string>>(new Map());
+  const [deleteTaskIds, setDeleteTaskIds] = useState<string[]>([]);
+  const [existingTaskInfo, setExistingTaskInfo] = useState<Map<string, ExistingTaskInfo>>(
+    new Map(),
+  );
   const [previewMilestones, setPreviewMilestones] = useState<ExtractedMilestone[]>([]);
+  const [deleteMilestoneIds, setDeleteMilestoneIds] = useState<string[]>([]);
   const [existingMilestoneNames, setExistingMilestoneNames] = useState<Map<string, string>>(
     new Map(),
   );
@@ -53,23 +58,33 @@ export function ImportDialog({
     startTransition(async () => {
       try {
         if (mode === "tasks") {
-          const { tasks, existingTasks } = await extractTasksPreview(projectId, text);
-          if (tasks.length === 0) {
-            setError("文書からタスクを抽出できませんでした。内容を確認してください。");
-            return;
-          }
-          setPreviewTasks(tasks);
-          setExistingTaskTitles(new Map(existingTasks.map((t) => [t.id, t.title])));
-        } else {
-          const { milestones, existingMilestones } = await extractMilestonesPreview(
+          const { tasks, deleteTaskIds: delIds, existingTasks } = await extractTasksPreview(
             projectId,
             text,
           );
-          if (milestones.length === 0) {
-            setError("文書からマイルストーンを抽出できませんでした。内容を確認してください。");
+          if (tasks.length === 0 && delIds.length === 0) {
+            setError("文書からタスクの追加・更新・削除を抽出できませんでした。内容を確認してください。");
+            return;
+          }
+          setPreviewTasks(tasks);
+          setDeleteTaskIds(delIds);
+          setExistingTaskInfo(
+            new Map(existingTasks.map((t) => [t.id, { title: t.title, childCount: t.childCount }])),
+          );
+        } else {
+          const {
+            milestones,
+            deleteMilestoneIds: delIds,
+            existingMilestones,
+          } = await extractMilestonesPreview(projectId, text);
+          if (milestones.length === 0 && delIds.length === 0) {
+            setError(
+              "文書からマイルストーンの追加・更新・削除を抽出できませんでした。内容を確認してください。",
+            );
             return;
           }
           setPreviewMilestones(milestones);
+          setDeleteMilestoneIds(delIds);
           setExistingMilestoneNames(new Map(existingMilestones.map((m) => [m.id, m.name])));
         }
         setPhase("preview");
@@ -84,15 +99,20 @@ export function ImportDialog({
     startTransition(async () => {
       try {
         if (mode === "tasks") {
-          const { created, updated } = await commitTasksFromPreview(projectId, previewTasks);
-          setResult(`反映しました(新規 ${created}件・更新 ${updated}件)。`);
+          const { created, updated, deleted } = await commitTasksFromPreview(
+            projectId,
+            previewTasks,
+            deleteTaskIds,
+          );
+          setResult(`反映しました(新規 ${created}件・更新 ${updated}件・削除 ${deleted}件)。`);
         } else {
-          const { created, updated, skipped } = await commitMilestonesFromPreview(
+          const { created, updated, skipped, deleted } = await commitMilestonesFromPreview(
             projectId,
             previewMilestones,
+            deleteMilestoneIds,
           );
           setResult(
-            `反映しました(新規 ${created}件・更新 ${updated}件)。` +
+            `反映しました(新規 ${created}件・更新 ${updated}件・削除 ${deleted}件)。` +
               (skipped ? `(日付が不明で${skipped}件をスキップ)` : ""),
           );
         }
@@ -109,7 +129,9 @@ export function ImportDialog({
     setError(null);
     setResult(null);
     setPreviewTasks([]);
+    setDeleteTaskIds([]);
     setPreviewMilestones([]);
+    setDeleteMilestoneIds([]);
   }
 
   function handleClose() {
@@ -145,7 +167,7 @@ export function ImportDialog({
             <form onSubmit={handleExtract} className="flex flex-col gap-3">
               <p className="text-xs text-stone-500">
                 テキスト/Markdown文書を貼り付けるか、ファイルを選択してください。AIが内容を解析し、
-                新規{label}の追加案・既存{label}の更新案を作成します(内容を確認してから反映します)。
+                新規{label}の追加案・既存{label}の更新案・削除案を作成します(内容を確認してから反映します)。
               </p>
 
               <label className="text-sm">
@@ -197,14 +219,38 @@ export function ImportDialog({
                 以下の内容で{label}に反映します。よろしいですか?
                 <span className="ml-1 text-xs text-stone-500">
                   {mode === "tasks"
-                    ? `(新規 ${taskCreateCount}件・更新 ${taskUpdateCount}件)`
-                    : `(新規 ${milestoneCreateCount}件・更新 ${milestoneUpdateCount}件)`}
+                    ? `(新規 ${taskCreateCount}件・更新 ${taskUpdateCount}件・削除 ${deleteTaskIds.length}件)`
+                    : `(新規 ${milestoneCreateCount}件・更新 ${milestoneUpdateCount}件・削除 ${deleteMilestoneIds.length}件)`}
                 </span>
               </p>
 
               <ul className="flex max-h-80 flex-col gap-1.5 overflow-y-auto rounded-lg border border-stone-200 p-2">
-                {mode === "tasks"
-                  ? previewTasks.map((t) => (
+                {mode === "tasks" ? (
+                  <>
+                    {deleteTaskIds.map((id) => {
+                      const info = existingTaskInfo.get(id);
+                      return (
+                        <li
+                          key={`del-${id}`}
+                          className="flex items-start gap-2 rounded-md bg-red-50/50 px-2 py-1.5 text-sm"
+                        >
+                          <span className="mt-0.5 shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-700">
+                            削除
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-stone-800">
+                              {info?.title ?? id}
+                            </span>
+                            {info && info.childCount > 0 && (
+                              <span className="block text-xs text-red-600">
+                                子タスク{info.childCount}件も一緒に削除されます
+                              </span>
+                            )}
+                          </span>
+                        </li>
+                      );
+                    })}
+                    {previewTasks.map((t) => (
                       <li
                         key={t.tempId}
                         className="flex items-start gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-stone-50"
@@ -219,19 +265,36 @@ export function ImportDialog({
                           {t.existingTaskId ? "更新" : "新規"}
                         </span>
                         <span className="min-w-0 flex-1">
-                          {t.existingTaskId && existingTaskTitles.get(t.existingTaskId) !== t.title && (
-                            <span className="block truncate text-xs text-stone-400 line-through">
-                              {existingTaskTitles.get(t.existingTaskId)}
-                            </span>
-                          )}
+                          {t.existingTaskId &&
+                            existingTaskInfo.get(t.existingTaskId)?.title !== t.title && (
+                              <span className="block truncate text-xs text-stone-400 line-through">
+                                {existingTaskInfo.get(t.existingTaskId)?.title}
+                              </span>
+                            )}
                           <span className="block truncate text-stone-800">{t.title}</span>
                         </span>
                         <span className="shrink-0 text-xs text-stone-400">
                           {priorityLabels[t.priority]}
                         </span>
                       </li>
-                    ))
-                  : previewMilestones.map((m) => (
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    {deleteMilestoneIds.map((id) => (
+                      <li
+                        key={`del-${id}`}
+                        className="flex items-start gap-2 rounded-md bg-red-50/50 px-2 py-1.5 text-sm"
+                      >
+                        <span className="mt-0.5 shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-700">
+                          削除
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-stone-800">
+                          {existingMilestoneNames.get(id) ?? id}
+                        </span>
+                      </li>
+                    ))}
+                    {previewMilestones.map((m) => (
                       <li
                         key={m.tempId}
                         className="flex items-start gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-stone-50"
@@ -257,7 +320,16 @@ export function ImportDialog({
                         <span className="shrink-0 text-xs text-stone-400">{m.date}</span>
                       </li>
                     ))}
+                  </>
+                )}
               </ul>
+
+              {((mode === "tasks" && deleteTaskIds.length > 0) ||
+                (mode === "milestones" && deleteMilestoneIds.length > 0)) && (
+                <p className="text-xs text-red-600">
+                  ⚠ 削除は反映すると元に戻せません。内容をよくご確認ください。
+                </p>
+              )}
 
               {error && <p className="text-sm text-red-600">{error}</p>}
 

@@ -16,9 +16,10 @@ import {
 
 /**
  * Step 1 of the two-step import flow: calls the AI to extract proposed
- * tasks (creates and/or updates to existing tasks) from a document, WITHOUT
- * writing anything to the database yet. The caller shows this as a preview
- * and only calls `commitTasksFromPreview` once the user approves it.
+ * tasks (creates, updates to existing tasks, and/or deletions) from a
+ * document, WITHOUT writing anything to the database yet. The caller shows
+ * this as a preview and only calls `commitTasksFromPreview` once the user
+ * approves it.
  */
 export async function extractTasksPreview(projectId: string, docText: string) {
   const text = docText.trim();
@@ -28,23 +29,48 @@ export async function extractTasksPreview(projectId: string, docText: string) {
     where: { projectId },
     select: { id: true, title: true, parentId: true, description: true, priority: true },
   });
+  const childCountByParentId = new Map<string, number>();
+  for (const t of existing) {
+    if (t.parentId) childCountByParentId.set(t.parentId, (childCountByParentId.get(t.parentId) ?? 0) + 1);
+  }
 
-  const tasks = await extractTasksFromDocument(text, existing);
+  const { tasks, deleteTaskIds } = await extractTasksFromDocument(text, existing);
   return {
     tasks,
-    existingTasks: existing.map((t) => ({ id: t.id, title: t.title })),
+    deleteTaskIds,
+    existingTasks: existing.map((t) => ({
+      id: t.id,
+      title: t.title,
+      childCount: childCountByParentId.get(t.id) ?? 0,
+    })),
   };
 }
 
 /**
  * Step 2: the user has reviewed the preview and approved it (or approved it
- * unchanged) — actually create/update the tasks. Items with `existingTaskId`
- * set are updates (and re-flagged isAiDraft for review, same as a create);
- * everything else is a new task. `parentRef` may point at another item's
- * `tempId` in this same batch, or at a real existing task id.
+ * unchanged) — actually create/update/delete the tasks. Items with
+ * `existingTaskId` set are updates (and re-flagged isAiDraft for review,
+ * same as a create); everything else is a new task. `parentRef` may point
+ * at another item's `tempId` in this same batch, or at a real existing task
+ * id. `deleteTaskIds` are removed outright (cascades to their subtasks).
  */
-export async function commitTasksFromPreview(projectId: string, tasks: ExtractedTask[]) {
-  if (tasks.length === 0) return { created: 0, updated: 0 };
+export async function commitTasksFromPreview(
+  projectId: string,
+  tasks: ExtractedTask[],
+  deleteTaskIds: string[] = [],
+) {
+  let deleted = 0;
+  if (deleteTaskIds.length > 0) {
+    const result = await prisma.task.deleteMany({
+      where: { id: { in: deleteTaskIds }, projectId },
+    });
+    deleted = result.count;
+  }
+
+  if (tasks.length === 0) {
+    revalidatePath(`/projects/${projectId}`);
+    return { created: 0, updated: 0, deleted };
+  }
 
   const existingIds = new Set(
     (await prisma.task.findMany({ where: { projectId }, select: { id: true } })).map((t) => t.id),
@@ -132,7 +158,7 @@ export async function commitTasksFromPreview(projectId: string, tasks: Extracted
   }
 
   revalidatePath(`/projects/${projectId}`);
-  return { created, updated };
+  return { created, updated, deleted };
 }
 
 // ---------------------------------------------------------------------------
@@ -148,9 +174,10 @@ export async function extractMilestonesPreview(projectId: string, docText: strin
     select: { id: true, name: true, date: true, description: true },
   });
 
-  const milestones = await extractMilestonesFromDocument(text, existing);
+  const { milestones, deleteMilestoneIds } = await extractMilestonesFromDocument(text, existing);
   return {
     milestones,
+    deleteMilestoneIds,
     existingMilestones: existing.map((m) => ({ id: m.id, name: m.name })),
   };
 }
@@ -158,8 +185,20 @@ export async function extractMilestonesPreview(projectId: string, docText: strin
 export async function commitMilestonesFromPreview(
   projectId: string,
   milestones: ExtractedMilestone[],
+  deleteMilestoneIds: string[] = [],
 ) {
-  if (milestones.length === 0) return { created: 0, updated: 0, skipped: 0 };
+  let deleted = 0;
+  if (deleteMilestoneIds.length > 0) {
+    const result = await prisma.milestone.deleteMany({
+      where: { id: { in: deleteMilestoneIds }, projectId },
+    });
+    deleted = result.count;
+  }
+
+  if (milestones.length === 0) {
+    revalidatePath(`/projects/${projectId}`);
+    return { created: 0, updated: 0, skipped: 0, deleted };
+  }
 
   const existingIds = new Set(
     (await prisma.milestone.findMany({ where: { projectId }, select: { id: true } })).map(
@@ -204,5 +243,5 @@ export async function commitMilestonesFromPreview(
   }
 
   revalidatePath(`/projects/${projectId}`);
-  return { created, updated, skipped };
+  return { created, updated, skipped, deleted };
 }

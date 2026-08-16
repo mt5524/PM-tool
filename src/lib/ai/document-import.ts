@@ -30,6 +30,12 @@ const ExtractedTaskSchema = z.object({
 
 const TaskExtractionSchema = z.object({
   tasks: z.array(ExtractedTaskSchema),
+  deleteTaskIds: z
+    .array(z.string())
+    .describe(
+      "文書が既存タスクの削除を指示している場合、そのタスクのIDをここに列挙する。" +
+        "削除対象のタスクはtasks配列には含めないこと(更新と削除は排他)。削除指示がなければ空配列。",
+    ),
 });
 
 const ExtractedMilestoneSchema = z.object({
@@ -45,6 +51,12 @@ const ExtractedMilestoneSchema = z.object({
 
 const MilestoneExtractionSchema = z.object({
   milestones: z.array(ExtractedMilestoneSchema),
+  deleteMilestoneIds: z
+    .array(z.string())
+    .describe(
+      "文書が既存マイルストーンの削除を指示している場合、そのマイルストーンのIDをここに列挙する。" +
+        "削除対象はmilestones配列には含めないこと(更新と削除は排他)。削除指示がなければ空配列。",
+    ),
 });
 
 export type ExtractedTask = z.infer<typeof ExtractedTaskSchema>;
@@ -75,14 +87,15 @@ function getClient() {
 }
 
 /**
- * 自由記述のテキスト文書からWBSタスクの新規追加・既存タスクの更新を抽出する。
+ * 自由記述のテキスト文書からWBSタスクの新規追加・既存タスクの更新・削除指示を抽出する。
  * `existingTasks` を渡すことで、文書中の記述が既存タスクを指しているかどうかを
- * AIに判断させ、該当する場合は existingTaskId を設定させる(=更新扱い)。
+ * AIに判断させ、該当する場合は existingTaskId を設定(=更新)、または
+ * deleteTaskIds に含める(=削除)。
  */
 export async function extractTasksFromDocument(
   docText: string,
   existingTasks: ExistingTaskContext[],
-): Promise<ExtractedTask[]> {
+): Promise<{ tasks: ExtractedTask[]; deleteTaskIds: string[] }> {
   const client = getClient();
   const titleById = new Map(existingTasks.map((t) => [t.id, t.title]));
   const existingListText = existingTasks.length
@@ -100,10 +113,14 @@ export async function extractTasksFromDocument(
     model: "claude-opus-5",
     max_tokens: 8000,
     system:
-      "あなたはプロジェクト文書からWBS(作業分解構成図)のタスクを抽出・更新する専門家です。\n" +
-      "文書には新規タスクの追加だけでなく、既存タスクの変更(タイトル変更、優先度変更、説明の追記、進捗の反映など)が含まれる場合があります。\n" +
+      "あなたはプロジェクト文書からWBS(作業分解構成図)のタスクを抽出・更新・削除する専門家です。\n" +
+      "文書には新規タスクの追加・既存タスクの変更(タイトル変更、優先度変更、説明の追記、進捗の反映など)に加えて、" +
+      "既存タスクの削除指示が含まれる場合があります。\n" +
       "文書中の記述が下記の既存タスクのいずれかを指している場合は、existingTaskIdにそのIDを設定してください(=更新)。" +
-      "新規タスクの場合はexistingTaskIdをnullにしてください。\n\n" +
+      "新規タスクの場合はexistingTaskIdをnullにしてください。\n" +
+      "文書が既存タスクの削除を明確に指示している場合は、そのタスクのIDをdeleteTaskIdsに追加してください" +
+      "(このタスクをtasks配列には含めないこと)。削除対象のタスクに子タスクがある場合、子タスクも一緒に削除される" +
+      "ことを前提に判断してください。\n\n" +
       `## 既存タスク一覧\n${existingListText}\n\n` +
       "各タスクには一意な仮ID(tempId)を振ってください(既存タスクの更新の場合も便宜上必要です)。" +
       "親子関係はparentRefで表現し、この文書内の他タスクのtempId、または既存タスク一覧のID、のいずれかを指定できます。" +
@@ -119,16 +136,19 @@ export async function extractTasksFromDocument(
   if (response.stop_reason === "refusal") {
     throw new Error("AIが処理を拒否しました。文書の内容を確認してください。");
   }
-  return response.parsed_output?.tasks ?? [];
+  return {
+    tasks: response.parsed_output?.tasks ?? [],
+    deleteTaskIds: response.parsed_output?.deleteTaskIds ?? [],
+  };
 }
 
 /**
- * 自由記述のテキスト文書からマイルストーンの新規追加・既存マイルストーンの更新を抽出する。
+ * 自由記述のテキスト文書からマイルストーンの新規追加・既存マイルストーンの更新・削除指示を抽出する。
  */
 export async function extractMilestonesFromDocument(
   docText: string,
   existingMilestones: ExistingMilestoneContext[],
-): Promise<ExtractedMilestone[]> {
+): Promise<{ milestones: ExtractedMilestone[]; deleteMilestoneIds: string[] }> {
   const client = getClient();
   const existingListText = existingMilestones.length
     ? existingMilestones
@@ -145,9 +165,11 @@ export async function extractMilestonesFromDocument(
     model: "claude-opus-5",
     max_tokens: 4000,
     system:
-      "あなたはプロジェクト文書からマイルストーン(節目となる日付・イベント)を抽出・更新する専門家です。\n" +
+      "あなたはプロジェクト文書からマイルストーン(節目となる日付・イベント)を抽出・更新・削除する専門家です。\n" +
       "文書中の記述が下記の既存マイルストーンのいずれかを指している(日付変更など)場合は、existingMilestoneIdにそのIDを設定してください(=更新)。" +
-      "新規の場合はnullにしてください。\n\n" +
+      "新規の場合はnullにしてください。\n" +
+      "文書が既存マイルストーンの削除を明確に指示している場合は、そのマイルストーンのIDをdeleteMilestoneIdsに追加してください" +
+      "(このマイルストーンをmilestones配列には含めないこと)。\n\n" +
       `## 既存マイルストーン一覧\n${existingListText}\n\n` +
       "日付が明記されていない新規マイルストーンについては、文脈から最も妥当な日付を推定してください。" +
       "既存マイルストーンを更新する際、文書内で変更が明示されていないフィールドは現在の値をそのまま引き継いでください。",
@@ -160,7 +182,10 @@ export async function extractMilestonesFromDocument(
   if (response.stop_reason === "refusal") {
     throw new Error("AIが処理を拒否しました。文書の内容を確認してください。");
   }
-  return response.parsed_output?.milestones ?? [];
+  return {
+    milestones: response.parsed_output?.milestones ?? [],
+    deleteMilestoneIds: response.parsed_output?.deleteMilestoneIds ?? [],
+  };
 }
 
 export function toPriorityEnum(value: string): Priority {
