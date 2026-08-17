@@ -48,3 +48,14 @@ export async function deleteProject(projectId: string) {
   revalidatePath("/");
   redirect("/");
 }
+
+/** One-click archive/unarchive, without going through the full settings form. */
+export async function setProjectArchived(projectId: string, archived: boolean) {
+  await prisma.project.update({
+    where: { id: projectId },
+    data: { status: archived ? ProjectStatus.ARCHIVED : ProjectStatus.ACTIVE },
+  });
+  revalidatePath("/");
+  revalidatePath("/archived");
+  revalidatePath(`/projects/${projectId}`);
+}

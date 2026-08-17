@@ -5,6 +5,7 @@ import { toDateInputValue } from "@/lib/forms";
 import { projectStatusLabels } from "@/lib/labels";
 import { ProjectStatus } from "@prisma/client";
 import { DeleteButton } from "@/components/DeleteButton";
+import { ArchiveButton } from "@/components/ArchiveButton";
 
 export default async function ProjectSettingsPage({
   params,
@@ -85,6 +86,21 @@ export default async function ProjectSettingsPage({
           保存
         </button>
       </form>
+
+      <div className="flex items-center justify-between rounded-lg border border-stone-200 bg-stone-50 p-4">
+        <div>
+          <h3 className="mb-1 text-sm font-medium text-stone-700">アーカイブ</h3>
+          <p className="text-xs text-stone-500">
+            {project.status === ProjectStatus.ARCHIVED
+              ? "このプロジェクトはアーカイブ済みです。プロジェクト一覧には表示されません。"
+              : "作業が終わったプロジェクトをアーカイブすると、通常の一覧から隠れます(いつでも解除できます)。"}
+          </p>
+        </div>
+        <ArchiveButton
+          projectId={projectId}
+          archived={project.status === ProjectStatus.ARCHIVED}
+        />
+      </div>
 
       <div className="rounded-lg border border-red-200 bg-red-50 p-4">
         <h3 className="mb-1 text-sm font-medium text-red-700">危険な操作</h3>

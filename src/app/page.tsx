@@ -3,9 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { ProjectDialog } from "@/components/ProjectDialog";
 import { projectStatusColors, projectStatusLabels } from "@/lib/labels";
 import { formatDate } from "@/lib/format";
+import { ProjectStatus } from "@prisma/client";
 
 export default async function DashboardPage() {
   const projects = await prisma.project.findMany({
+    where: { status: { not: ProjectStatus.ARCHIVED } },
     orderBy: { updatedAt: "desc" },
     include: { _count: { select: { tasks: true, milestones: true } } },
   });
@@ -23,6 +25,12 @@ export default async function DashboardPage() {
             className="rounded-lg border border-stone-300 px-4 py-2 text-sm text-stone-600 hover:bg-stone-100"
           >
             全マイルストーン
+          </Link>
+          <Link
+            href="/archived"
+            className="rounded-lg border border-stone-300 px-4 py-2 text-sm text-stone-600 hover:bg-stone-100"
+          >
+            アーカイブ済み
           </Link>
           <ProjectDialog
             trigger={
