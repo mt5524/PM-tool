@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ProjectTabs } from "@/components/ProjectTabs";
+import { ProjectDialog } from "@/components/ProjectDialog";
 import { projectStatusColors, projectStatusLabels } from "@/lib/labels";
 
 export default async function ProjectLayout({
@@ -27,6 +28,12 @@ export default async function ProjectLayout({
         >
           {projectStatusLabels[project.status]}
         </span>
+        <ProjectDialog
+          project={project}
+          trigger={
+            <span className="cursor-pointer text-sm text-amber-700 hover:underline">編集</span>
+          }
+        />
       </div>
       {project.description && (
         <p className="mb-4 text-sm text-stone-500">{project.description}</p>
