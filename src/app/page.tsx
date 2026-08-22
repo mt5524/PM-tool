@@ -21,6 +21,12 @@ export default async function DashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <Link
+            href="/today"
+            className="rounded-lg border border-stone-300 px-4 py-2 text-sm text-stone-600 hover:bg-stone-100"
+          >
+            今日のタスク
+          </Link>
+          <Link
             href="/milestones"
             className="rounded-lg border border-stone-300 px-4 py-2 text-sm text-stone-600 hover:bg-stone-100"
           >
@@ -31,6 +37,12 @@ export default async function DashboardPage() {
             className="rounded-lg border border-stone-300 px-4 py-2 text-sm text-stone-600 hover:bg-stone-100"
           >
             アーカイブ済み
+          </Link>
+          <Link
+            href="/legend"
+            className="rounded-lg border border-stone-300 px-4 py-2 text-sm text-stone-600 hover:bg-stone-100"
+          >
+            色の凡例
           </Link>
           <ProjectDialog
             trigger={

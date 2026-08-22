@@ -48,6 +48,23 @@ export function flattenWbsTree(nodes: TaskNode[]): TaskNode[] {
   return out;
 }
 
+export type FlatTaskNode = TaskNode & { depth: number };
+
+/**
+ * Like `flattenWbsTree`, but also records each node's nesting depth (0 for
+ * top-level tasks). Used to render the tree as a single flat list — e.g. a
+ * WBS table with an aligned Gantt timeline column, where indentation is done
+ * via padding instead of nested `<ul>` elements.
+ */
+export function flattenWbsTreeWithDepth(nodes: TaskNode[], depth = 0): FlatTaskNode[] {
+  const out: FlatTaskNode[] = [];
+  for (const node of nodes) {
+    out.push({ ...node, depth });
+    out.push(...flattenWbsTreeWithDepth(node.children, depth + 1));
+  }
+  return out;
+}
+
 /** Finds a node anywhere in the tree by id (depth-first search). */
 export function findWbsNode(nodes: TaskNode[], id: string): TaskNode | undefined {
   for (const node of nodes) {

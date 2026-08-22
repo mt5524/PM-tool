@@ -1,23 +1,10 @@
 import { addDays, differenceInCalendarDays, eachWeekOfInterval, format, isWithinInterval } from "date-fns";
 import { ja } from "date-fns/locale";
-import type { Milestone, Task, TaskStatus } from "@prisma/client";
-import { taskStatusLabels } from "@/lib/labels";
+import type { Milestone, Task } from "@prisma/client";
+import { taskStatusBarColors, taskStatusLabels } from "@/lib/labels";
 
 const DAY_WIDTH = 24;
 const LABEL_WIDTH = 220;
-
-function barColor(status: TaskStatus): string {
-  switch (status) {
-    case "DONE":
-      return "bg-emerald-400";
-    case "IN_PROGRESS":
-      return "bg-amber-400";
-    case "REVIEW":
-      return "bg-purple-400";
-    default:
-      return "bg-stone-300";
-  }
-}
 
 export function GanttChart({ tasks, milestones }: { tasks: Task[]; milestones: Milestone[] }) {
   const dates: Date[] = [];
@@ -97,7 +84,7 @@ export function GanttChart({ tasks, milestones }: { tasks: Task[]; milestones: M
                   />
                 )}
                 <div
-                  className={`absolute top-2 h-5 rounded ${barColor(task.status)}`}
+                  className={`absolute top-2 h-5 rounded ${taskStatusBarColors[task.status]}`}
                   style={{ left, width }}
                   title={`${task.title} (${taskStatusLabels[task.status]})`}
                 />

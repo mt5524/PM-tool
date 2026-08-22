@@ -30,6 +30,23 @@ export const taskStatusOrder: TaskStatus[] = [
   TaskStatus.DONE,
 ];
 
+// Badge (background/text) colors — used for status pills.
+export const taskStatusColors: Record<TaskStatus, string> = {
+  TODO: "bg-stone-100 text-stone-600",
+  IN_PROGRESS: "bg-amber-100 text-amber-700",
+  REVIEW: "bg-purple-100 text-purple-700",
+  DONE: "bg-emerald-100 text-emerald-700",
+};
+
+// Solid fill colors — used for Gantt/WBS timeline bars (needs a stronger,
+// non-transparent shade to read well against the day-grid background).
+export const taskStatusBarColors: Record<TaskStatus, string> = {
+  TODO: "bg-stone-300",
+  IN_PROGRESS: "bg-amber-400",
+  REVIEW: "bg-purple-400",
+  DONE: "bg-emerald-400",
+};
+
 export const priorityLabels: Record<Priority, string> = {
   LOW: "低",
   MEDIUM: "中",
